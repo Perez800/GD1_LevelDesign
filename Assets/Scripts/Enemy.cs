@@ -5,6 +5,7 @@ using UnityEngine.Splines;
 
 public class Enemy : MonoBehaviour
 {
+    public GameObject player;
     public int MaxHP = 3;
     private int currentHP;
     public SplineContainer spline;
@@ -13,6 +14,10 @@ public class Enemy : MonoBehaviour
     float distancePercentage = 0f;
     public bool patrolMovement = true;
     public Collider patrolTrigger;
+    public bool aggroed = false;
+    public float loseAggro = 30f;
+    public float inAttackRange = 2f;
+    public float aggroedSpeed = 20f;
 
     void Start()
     {
@@ -22,6 +27,7 @@ public class Enemy : MonoBehaviour
     public void DecreaseHP(int dmg)
     {
         currentHP -= dmg;
+        print(currentHP);
         if (currentHP <= 0)
         {
             Destroy(this.gameObject);
@@ -37,12 +43,18 @@ public class Enemy : MonoBehaviour
     }
     private void Update()
     {
-        if (patrolTrigger == null)
+        if (aggroed == true)
         {
-            if (spline != null)
+            AggroedMove();
+        }
+        if (aggroed == false)
+        {
+            if ((patrolTrigger == null) && (spline != null))
             {
                 if (patrolMovement)
+                {
                     PatrolMove();
+                }
             }
         }
     }
@@ -63,5 +75,23 @@ public class Enemy : MonoBehaviour
         Vector3 direction = nextPosition - currentPosition;
 
         transform.rotation = Quaternion.LookRotation(direction, transform.up);
+    }
+    private void AggroedMove()
+    {
+        transform.LookAt(player.transform.position);
+
+        if (Vector3.Distance(transform.position, player.transform.position) >= inAttackRange)
+        {
+
+            transform.position += transform.forward * aggroedSpeed * Time.deltaTime;
+
+
+
+            if (Vector3.Distance(transform.position, player.transform.position) >= loseAggro)
+            {
+                aggroed = false;
+            }
+
+        }
     }
 }

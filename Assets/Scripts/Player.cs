@@ -22,9 +22,12 @@ public class Player : MonoBehaviour
     public int meleeDamage = 10;
     public GameObject attackHitBox;
 
+    [Header("Stealth")]
+    public bool isDetectable = true;
+
     void Start()
     {
-        controller = gameObject.AddComponent<CharacterController>();
+        
     }
 
     void Update()
@@ -81,5 +84,21 @@ public class Player : MonoBehaviour
         attackHitBox.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         attackHitBox.SetActive(false);
+    }
+
+    //Stealth
+    void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Bush"))
+        {
+            isDetectable = false;
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Bush"))
+        {
+            isDetectable = true;
+        }
     }
 }
